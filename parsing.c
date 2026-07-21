@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
+#include "codexion.h"
 int scheduler_checker(char *str)
 {
     if (strcmp(str, "fifo") == 0)
