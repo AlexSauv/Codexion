@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 15:01:47 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/17 17:25:38 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/17 19:19:28 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,21 @@
 #include <limits.h>
 # include <pthread.h>
 
-typedef struct s_codex t_codex;
-long           get_current_time(void);
-void *main_coder_events(void *arg);
-int init_codex(t_codex *codex);
-void free_codex(t_codex *codex);
-void print_log(t_codex *codex, int coder_id, char *status);
+typedef struct	s_codex t_codex;
+int				init_codex(t_codex *codex);
+long			get_current_time(void);
+void			*main_coder_events(void *arg);
+void			free_codex(t_codex *codex);
+void			print_log(t_codex *codex, int coder_id, char *status);
+void			*events_checker(t_codex *codex);
 
+typedef struct s_scheduler
+{
+    int 	coder_id;
+    long	arrival_time;
+    long	deadline;
+    int		waiting;
+} t_scheduler;
 
 typedef struct  s_coder
 {
@@ -33,6 +41,7 @@ typedef struct  s_coder
     pthread_t   thread;
 	long        nb_compile_done;
 	long        last_compile_start;
+	long		request;
     
     int         left_dongle;
     int         right_dongle;

@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 15:01:43 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/17 17:22:21 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/17 18:00:31 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,32 +74,4 @@ int args_checker(int argc, char **argv, t_codex *codex)
     }
     init_simu(codex, argv);
     return (1);
-}
-
-int main(int argc, char **argv)
-{
-    t_codex codex;
-    long i;
-
-    if (!args_checker(argc, argv, &codex)){
-            fprintf(stderr, "Format: ./codexion [nb_of_coders] [time_burnout]"
-                    " [time_compile] [time_debug] \n                  "
-                    " [time_refactor] [number_of_compiles_required]\n "
-                    "                  [dongle_cooldown] [scheduler]\n");
-            return (1);
-    }
-    pthread_mutex_init(&codex.log_mutex, NULL);
-    codex.simu_stopped = 0;
-    codex.start_at = get_current_time();
-    i = 0;
-    if (!init_codex(&codex))
-    {
-        free_codex(&codex);
-        return (0);
-    }
-    while (i < codex.nb_coders)
-    {
-        pthread_create(&codex.coders[i].thread, NULL, main_coder_events, &codex.coders[i]);
-        i++;
-    }
 }
