@@ -6,24 +6,25 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 17:52:38 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/17 18:44:50 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/18 14:30:32 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-static int check_burnouts(t_codex *codex)
+static int	check_burnouts(t_codex *codex)
 {
-	int	i;
-	long curr_time;
+	int		i;
+	long	curr_time;
 
 	i = 0;
 	while (i < codex->nb_coders)
 	{
 		curr_time = get_current_time() - codex->start_at;
-		if ((curr_time - codex->coders[i].last_compile_start) > codex->time_to_burnout)
+		if ((curr_time - codex->coders[i].last_compile_start)
+			> codex->time_to_burnout)
 		{
-			print_log(codex, codex->coders[i].id, "burned out");
+			print_events(codex, codex->coders[i].id, "burned out");
 			return (1);
 		}
 		i++;
@@ -31,10 +32,10 @@ static int check_burnouts(t_codex *codex)
 	return (0);
 }
 
-static int check_compiles_done(t_codex *codex)
+static int	check_compiles_done(t_codex *codex)
 {
-	int i;
-	int done;
+	int	i;
+	int	done;
 
 	i = 0;
 	done = 1;
@@ -45,26 +46,29 @@ static int check_compiles_done(t_codex *codex)
 		if (codex->coders[i].nb_compile_done < codex->nb_comp_required)
 		{
 			done = 0;
-			break;
+			break ;
 		}
 		i++;
 	}
 	return (done);
 }
 
-void *events_checker(t_codex *codex)
+void	*events_checker(void *arg)
 {
+	t_codex			*codex;
+
+	codex = (t_codex *) arg;
 	while (1)
 	{
 		if (codex->simu_stopped)
 			break ;
 		if (check_burnouts(codex))
 			return (NULL);
-		if (check_compile_done(codex))
+		if (check_compiles_done(codex))
 		{
-			pthread_mutex_lock(&codex->log_mutex);
+			pthread_mutex_lock(&codex->events_mutex);
 			codex->simu_stopped = 1;
-			pthread_mutex_unlock(&codex->log_mutex);
+			pthread_mutex_unlock(&codex->events_mutex);
 			return (NULL);
 		}
 		usleep(500);

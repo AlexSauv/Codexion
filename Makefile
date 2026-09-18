@@ -1,7 +1,12 @@
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -MMD -MP -g3
 NAME = codexion
-SRCS = parsing.c time_handler.c codex.c codexion.c
+SRCS = parsing.c \
+	time_handler.c \
+	checker_state.c \
+	initialisation_codex.c \
+	codexion.c \
+	dongle_handling.c
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
 .PHONY: all clean fclean re
@@ -15,7 +20,6 @@ $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $@
 
 -include $(DEPS)
-
 
 clean:
 	rm -f $(OBJS) $(DEPS)
