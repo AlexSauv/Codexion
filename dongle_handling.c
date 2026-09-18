@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 18:55:13 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/18 14:54:41 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/18 17:11:46 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,13 +119,29 @@ static void	get_a_dongle_by_edf(t_coder *coder, int dongle)
 	}
 }
 
-void	get_a_dongle(t_coder *coder, int dongle)
+void	get_dongles(t_coder *coder, int *first_dongle, int *second_dongle)
 {
 	t_codex		*codex;
 
 	codex = coder->codex;
+    if (coder->left_dongle < coder->right_dongle)
+		{
+			*first_dongle = coder->left_dongle;
+			*second_dongle = coder->right_dongle;
+		}
+		else
+		{
+			*first_dongle = coder->right_dongle;
+			*second_dongle = coder->left_dongle;
+		}
 	if (strcmp(codex->scheduler, "fifo") == 0)
-		get_a_dongle_by_fifo(coder, dongle);
+    {
+        get_a_dongle_by_fifo(coder, *first_dongle);
+        get_a_dongle_by_fifo(coder, *second_dongle);
+    }
 	else if (strcmp(codex->scheduler, "edf") == 0)
-		get_a_dongle_by_edf(coder, dongle);
+    {
+		get_a_dongle_by_edf(coder, *first_dongle);
+		get_a_dongle_by_edf(coder, *second_dongle);
+    }
 }
