@@ -6,52 +6,11 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 16:50:44 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/18 18:11:23 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/20 17:07:20 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-
-void	drop_a_dongle(t_codex *codex, int dongle)
-{
-	codex->dongle_cooldowns[dongle] = (get_current_time() - codex->start_at);
-	codex->dongle_cooldowns[dongle] += codex->cooldown_dngl;
-	pthread_mutex_unlock(&codex->dongles[dongle]);
-}
-
-void	*coder_events(void *arg)
-{
-	t_coder		*coder;
-	t_codex		*codex;
-    int         first;
-    int         second;
-
-	coder = (t_coder *) arg;
-	if (coder->codex)
-		codex = coder->codex;
-	else
-		return (NULL);
-	coder->last_compile_start = get_current_time() - codex->start_at;
-	while (!codex->simu_stopped)
-	{
-		get_dongles(coder, &first, &second);
-        pthread_mutex_lock(&codex->events_mutex);
-		coder->last_compile_start = get_current_time() - codex->start_at;
-        pthread_mutex_unlock(&codex->events_mutex);
-		print_events(codex, coder->id, "is compiling");
-		usleep(codex->time_to_compile * 1000);
-        pthread_mutex_lock(&codex->events_mutex);
-		coder->nb_compile_done++;
-        pthread_mutex_unlock(&codex->events_mutex);
-		drop_a_dongle(codex, first);
-		drop_a_dongle(codex, second);
-		print_events(codex, coder->id, "is debugging");
-		usleep(codex->time_to_debug * 1000);
-		print_events(codex, coder->id, "is refactoring");
-		usleep(codex->time_to_refactor * 1000);
-	}
-	return (NULL);
-}
 
 int	main(int argc, char **argv)
 {
@@ -95,6 +54,7 @@ int	main(int argc, char **argv)
 		pthread_join(codex.coders[i].thread, NULL);
 		i++;
 	}
+    pthread_join(monitor_thread, NULL);
 	free_codex(&codex);
 	return (0);
 }

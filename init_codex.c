@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   initialisation_codex.c                             :+:      :+:    :+:   */
+/*   init_codex.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 16:00:11 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/18 18:02:17 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/20 16:48:34 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,16 +38,16 @@ int	generate_codex(t_codex *codex)
 	long	i;
 
 	i = -1;
-    codex->mutexes = 0;
+	codex->mutexes = 0;
 	while (++i < codex->nb_coders)
 	{
 		if (pthread_mutex_init(&codex->dongles[i], NULL) != 0)
 		{
 			fprintf(stderr, "[ERROR] Mutex failed for dongle %ld\n", i);
-            free_codex(codex);
+			free_codex(codex);
 			return (0);
 		}
-        codex->mutexes++;
+		codex->mutexes++;
 		codex->dongle_cooldowns[i] = 0;
 	}
 	i = -1;

@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 15:01:47 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/18 17:59:50 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/20 16:52:37 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,10 @@ void			*coder_events(void *arg);
 void			*events_checker(void *arg);
 void			free_codex(t_codex *codex);
 void			print_events(t_codex *codex, int coder_id, char *status);
-void			get_dongles(t_coder *coder, int *first_dongle, int *second_dongle);
-void			drop_a_dongle(t_codex *codex, int dongle);
+int				get_priority_deadline(t_coder *coder, int dongle);
+int				first_to_request(t_coder *coder, int dongle);
+void			get_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl);
+void			drop_dongles(t_codex *codex, int first_dgl, int scnd_dgl);
 
 typedef struct s_scheduler
 {
@@ -66,10 +68,11 @@ typedef struct s_codex
 
 	long				start_at;
 	pthread_mutex_t		events_mutex;
-    int                 mutexes;
+	int					mutexes;
 	int					simu_stopped;
-
+	
 	pthread_mutex_t		*dongles;
+	long				total_request;
 	long				*dongle_cooldowns;
 
 	t_coder				*coders;
