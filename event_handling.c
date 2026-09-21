@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/20 14:01:56 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/20 16:43:19 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/21 15:15:05 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,11 @@ static void	compiling_phase(t_coder *coder, int first_dongle, int second_dongle)
 	t_codex	*codex;
 
 	codex = coder->codex;
-	print_events(codex, coder->id, "is compiling");
 	pthread_mutex_lock(&codex->events_mutex);
 	coder->last_compile_start = get_current_time() - codex->start_at;
 	coder->nb_compile_done++;
 	pthread_mutex_unlock(&codex->events_mutex);
+	print_events(codex, coder->id, "is compiling");
 	usleep(codex->time_to_compile * 1000);
 	drop_dongles(codex, first_dongle, second_dongle);
 }
@@ -51,11 +51,7 @@ void	*coder_events(void *arg)
 	int			second;
 
 	coder = (t_coder *) arg;
-	if (coder->codex)
-		codex = coder->codex;
-	else
-		return (NULL);
-	coder->last_compile_start = get_current_time() - codex->start_at;
+	codex = coder->codex;
 	while (!codex->simu_stopped)
 	{
 		get_dongles(coder, &first, &second);

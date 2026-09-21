@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 16:00:11 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/20 16:48:34 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/21 15:46:09 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,32 @@ void	free_codex(t_codex *codex)
 	pthread_mutex_destroy(&codex->events_mutex);
 }
 
+static int init_coders(t_codex *codex)
+{
+	long	i;
+
+	i = 0;
+	while (i < codex->nb_coders)
+	{
+		codex->coders[i].id = i + 1;
+		codex->coders[i].nb_compile_done = 0;
+		codex->coders[i].last_compile_start = 0;
+		codex->coders[i].left_dongle = i;
+		codex->coders[i].right_dongle = (i + 1) % codex->nb_coders;
+        codex->coders[i].request = 0;
+		codex->coders[i].codex = codex;
+		i++;
+	}
+	return (1);
+}
+
 int	generate_codex(t_codex *codex)
 {
 	long	i;
 
-	i = -1;
+	i = 0;
 	codex->mutexes = 0;
-	while (++i < codex->nb_coders)
+	while (i < codex->nb_coders)
 	{
 		if (pthread_mutex_init(&codex->dongles[i], NULL) != 0)
 		{
@@ -49,17 +68,10 @@ int	generate_codex(t_codex *codex)
 		}
 		codex->mutexes++;
 		codex->dongle_cooldowns[i] = 0;
+        codex->total_request = 0;
+		i++;
 	}
-	i = -1;
-	while (++i < codex->nb_coders)
-	{
-		codex->coders[i].id = i + 1;
-		codex->coders[i].nb_compile_done = 0;
-		codex->coders[i].last_compile_start = 0;
-		codex->coders[i].left_dongle = i;
-		codex->coders[i].right_dongle = (i + 1) % codex->nb_coders;
-		codex->coders[i].codex = codex;
-	}
+	init_coders(codex);
 	return (1);
 }
 

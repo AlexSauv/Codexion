@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 15:01:47 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/20 16:52:37 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/21 15:52:37 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ void			free_codex(t_codex *codex);
 void			print_events(t_codex *codex, int coder_id, char *status);
 int				get_priority_deadline(t_coder *coder, int dongle);
 int				first_to_request(t_coder *coder, int dongle);
+int				dongle_available(t_coder *coder, int dongle);
 void			get_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl);
 void			drop_dongles(t_codex *codex, int first_dgl, int scnd_dgl);
 
