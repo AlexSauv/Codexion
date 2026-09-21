@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/20 14:01:56 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/21 15:15:05 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/21 17:10:21 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,17 +26,17 @@ static void	compiling_phase(t_coder *coder, int first_dongle, int second_dongle)
 	drop_dongles(codex, first_dongle, second_dongle);
 }
 
-static void	debugging_and_refacto_phase(t_coder *coder, int debug, int refacto)
+static void	debugging_and_refacto_phase(t_coder *coder, char *mode)
 {
 	t_codex	*codex;
 
 	codex = coder->codex;
-	if (debug == 1)
+	if (strcmp(mode, "debug") == 0)
 	{
 		print_events(codex, coder->id, "is debugging");
 		usleep(codex->time_to_debug * 1000);
 	}
-	if (refacto == 1)
+	if (strcmp(mode, "refacto") == 0)
 	{
 		print_events(codex, coder->id, "is refactoring");
 		usleep(codex->time_to_refactor * 1000);
@@ -56,8 +56,8 @@ void	*coder_events(void *arg)
 	{
 		get_dongles(coder, &first, &second);
 		compiling_phase(coder, first, second);
-		debugging_and_refacto_phase(coder, 1, 0);
-		debugging_and_refacto_phase(coder, 0, 1);
+		debugging_and_refacto_phase(coder, "debug");
+		debugging_and_refacto_phase(coder, "refacto");
 	}
 	return (NULL);
 }

@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 16:00:11 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/21 15:46:09 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/21 17:38:28 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,16 @@ void	free_codex(t_codex *codex)
 		}
 		free(codex->dongles);
 	}
+    if (codex->condi)
+    {
+        i = 0;
+        while (i < codex->nb_coders)
+        {
+            pthread_cond_destroy(&codex->condi[i]);
+            i++;
+        }
+        free(codex->condi);
+    }
 	if (codex->dongle_cooldowns)
 		free(codex->dongle_cooldowns);
 	if (codex->coders)
@@ -58,17 +68,21 @@ int	generate_codex(t_codex *codex)
 
 	i = 0;
 	codex->mutexes = 0;
+    codex->simu_stopped = 0;
+    codex->start_at = get_current_time();
+    codex->total_request = 0;
+
 	while (i < codex->nb_coders)
 	{
-		if (pthread_mutex_init(&codex->dongles[i], NULL) != 0)
+		if (pthread_mutex_init(&codex->dongles[i], NULL) != 0 
+                || pthread_cond_init(&codex->condi[i], NULL) != 0)
 		{
-			fprintf(stderr, "[ERROR] Mutex failed for dongle %ld\n", i);
+			fprintf(stderr, "[ERROR] Mutex or Condi failed for dongle %ld\n", i);
 			free_codex(codex);
 			return (0);
 		}
 		codex->mutexes++;
 		codex->dongle_cooldowns[i] = 0;
-        codex->total_request = 0;
 		i++;
 	}
 	init_coders(codex);
@@ -98,7 +112,14 @@ int	init_codex(t_codex *codex)
 		return (0);
 	}
 	memset(codex->coders, 0, sizeof(t_coder) * codex->nb_coders);
-	if (!generate_codex(codex))
+    codex->condi = malloc(sizeof(pthread_cond_t) * codex->nb_coders);
+    if (!codex->condi)
+    {
+        fprintf(stderr, "[ERROR] Conds memory allocation failed.");
+        return (0);
+    }
+    memset(codex->condi, 0, sizeof(pthread_cond_t) * codex->nb_coders);
+    if (!generate_codex(codex))
 		return (0);
 	return (1);
 }

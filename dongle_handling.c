@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 18:55:13 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/21 16:49:11 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/21 17:44:46 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,21 +41,15 @@ static void	get_a_dongle_by_fifo(t_coder *coder, int dongle)
 	while (!codex->simu_stopped)
 	{
         pthread_mutex_lock(&codex->dongles[dongle]);
-		curr_time = get_current_time() - codex->start_at;
 		if (first_to_request(coder, dongle))
 		{
             pthread_mutex_lock(&codex->events_mutex);
 			coder->request = 0;
             pthread_mutex_unlock(&codex->events_mutex);
-			print_events(codex, coder->id, "has taken a dongle");
 			break ;
 		}
-		wait_time = codex->dongle_cooldowns[dongle] - curr_time;
+        pthread_cond_wait(&codex->condi[dongle], &codex->dongles[dongle]);
 		pthread_mutex_unlock(&codex->dongles[dongle]);
-		if (wait_time > 0)
-            usleep(wait_time * 1000);
-		else
-            usleep(200);
 	}
 }
 
@@ -73,17 +67,10 @@ static void	get_a_dongle_by_edf(t_coder *coder, int dongle)
 		if (curr_time >= codex->dongle_cooldowns[dongle])
 		{
             if (get_priority_deadline(coder, dongle))
-			{
-                print_events(codex, coder->id, "has taken a dongle");
 				break ;
-			}
 		}
-		wait_time = codex->dongle_cooldowns[dongle] - curr_time;
+        pthread_cond_wait(&codex->condi[dongle], &codex->dongles[dongle]);
 		pthread_mutex_unlock(&codex->dongles[dongle]);
-		if (wait_time > 0)
-            usleep(wait_time * 1000);
-		else
-            usleep(200);
 	}
 }
 
@@ -95,9 +82,17 @@ static int  get_second_dongle(t_coder *coder, int dongle)
     if (dongle_available(coder, dongle))
     {
         if (strcmp(codex->scheduler, "fifo") == 0)
+        {
             get_a_dongle_by_fifo(coder, dongle);
+            print_events(codex, coder->id, "has taken a dongle");
+            print_events(codex, coder->id, "has taken a dongle");
+        }
         else
+        {
             get_a_dongle_by_edf(coder, dongle);
+            print_events(codex, coder->id, "has taken a dongle");
+            print_events(codex, coder->id, "has taken a dongle");
+        }
         return (1);
     }
     return (0);
@@ -133,7 +128,9 @@ void	drop_dongles(t_codex *codex, int first_dgl, int scnd_dgl)
 	codex->dongle_cooldowns[first_dgl] = (get_current_time() - codex->start_at);
 	codex->dongle_cooldowns[first_dgl] += codex->cooldown_dngl;
 	pthread_mutex_unlock(&codex->dongles[first_dgl]);
+    pthread_cond_broadcast(&codex->condi[first_dgl]);
 	codex->dongle_cooldowns[scnd_dgl] = (get_current_time() - codex->start_at);
 	codex->dongle_cooldowns[scnd_dgl] += codex->cooldown_dngl;
 	pthread_mutex_unlock(&codex->dongles[scnd_dgl]);
+    pthread_cond_broadcast(&codex->condi[scnd_dgl]);
 }

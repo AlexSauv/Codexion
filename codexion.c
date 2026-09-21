@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 16:50:44 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/20 17:07:20 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/21 16:55:11 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,17 +32,14 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	pthread_mutex_init(&codex.events_mutex, NULL);
-	codex.simu_stopped = 0;
 	if (!init_codex(&codex))
 	{
 		pthread_mutex_destroy(&codex.events_mutex);
 		return (1);
 	}
-	codex.start_at = get_current_time();
 	i = 0;
 	while (i < codex.nb_coders)
 	{
-		codex.coders[i].last_compile_start = 0;
 		pthread_create(&codex.coders[i].thread,
 			NULL, coder_events, &codex.coders[i]);
 		i++;

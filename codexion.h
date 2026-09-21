@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 15:01:47 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/21 15:52:37 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/21 17:27:28 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ typedef struct s_codex
 	int					simu_stopped;
 	
 	pthread_mutex_t		*dongles;
+	pthread_cond_t		*condi;
 	long				total_request;
 	long				*dongle_cooldowns;
 
