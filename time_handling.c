@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 15:01:34 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/21 17:36:44 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/22 18:21:09 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	print_events(t_codex *codex, int coder_id, char *status)
 	long	curr_time;
 
 	pthread_mutex_lock(&codex->events_mutex);
-	if (!codex->simu_stopped)
+	if (!codex_stopped(codex))
 	{
 		curr_time = get_current_time() - codex->start_at;
 		if (strcmp(status, "burned out") == 0)

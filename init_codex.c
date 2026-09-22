@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 16:00:11 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/22 16:23:56 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/22 18:20:02 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,16 @@ void	free_codex(t_codex *codex)
             i++;
         }
         free(codex->condi);
+    }
+    if (codex->dongle_heaps)
+    {
+        i = 0;
+        while (i < codex->nb_coders)
+        {
+            free(&codex->dongle_heaps[i]);
+            i++;
+        }
+        free(codex->dongle_heaps);
     }
 	if (codex->dongle_cooldowns)
 		free(codex->dongle_cooldowns);
@@ -80,7 +90,7 @@ int	generate_codex(t_codex *codex)
 			free_codex(codex);
 			return (0);
 		}
-		codex->dongle_heaps = heap_create(codex->nb_coders);
+		codex->dongle_heaps[i] = heap_create(codex->nb_coders);
 		codex->mutexes++;
 		codex->dongle_cooldowns[i] = 0;
 		i++;

@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/22 12:29:23 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/22 16:17:37 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/22 17:11:05 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	remove_coder_req(t_codex *codex, t_heap *heap, int coder_id)
 	pthread_mutex_lock(&codex->events_mutex);
 	while (i < heap->size)
 	{
-		if (heap->req->coder_id == coder_id)
+		if (heap->req[i].coder_id == coder_id)
 		{
 			while (i < heap->size - 1)
 			{
@@ -46,7 +46,7 @@ void	remove_coder_req(t_codex *codex, t_heap *heap, int coder_id)
 				i++;
 			}
 			heap->size--;
-			break;
+			break ;
 		}
 		i++;
 	}
@@ -66,6 +66,7 @@ void 	update_req(t_heap *heap, int coder_id, long req, long deadline)
 			heap->req[i].deadline = deadline;
 			return ;
 		}
+		i++;
 	}
 	if (heap->size < heap->capacity)
 	{
