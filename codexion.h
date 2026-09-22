@@ -34,13 +34,19 @@ int				dongle_available(t_coder *coder, int dongle);
 void			get_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl);
 void			drop_dongles(t_codex *codex, int first_dgl, int scnd_dgl);
 
-typedef struct s_scheduler
+typedef struct s_req
 {
 	int				coder_id;
 	long			arrival_time;
 	long			deadline;
-	int				waiting;
-}	t_scheduler;
+}	t_req;
+
+typedef struct s_heap
+{
+	t_req	*req;
+	int		capacity;
+	int		size;
+}	t_heap;
 
 typedef struct s_coder
 {
@@ -48,7 +54,6 @@ typedef struct s_coder
 	pthread_t	thread;
 	long		nb_compile_done;
 	long		last_compile_start;
-	long		request;
 
 	int			left_dongle;
 	int			right_dongle;
@@ -74,8 +79,9 @@ typedef struct s_codex
 	
 	pthread_mutex_t		*dongles;
 	pthread_cond_t		*condi;
-	long				total_request;
 	long				*dongle_cooldowns;
+    t_heap				*dongle_heaps;
+	long				total_request;
 
 	t_coder				*coders;
 }	t_codex;

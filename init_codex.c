@@ -55,7 +55,6 @@ static int init_coders(t_codex *codex)
 		codex->coders[i].last_compile_start = 0;
 		codex->coders[i].left_dongle = i;
 		codex->coders[i].right_dongle = (i + 1) % codex->nb_coders;
-        codex->coders[i].request = 0;
 		codex->coders[i].codex = codex;
 		i++;
 	}
@@ -81,6 +80,7 @@ int	generate_codex(t_codex *codex)
 			free_codex(codex);
 			return (0);
 		}
+		codex->dongle_heaps[i] = heap_create(codex->nb_coders);
 		codex->mutexes++;
 		codex->dongle_cooldowns[i] = 0;
 		i++;
@@ -119,6 +119,7 @@ int	init_codex(t_codex *codex)
         return (0);
     }
     memset(codex->condi, 0, sizeof(pthread_cond_t) * codex->nb_coders);
+	codex->dongle_heaps = malloc(sizeof(t_heap *) * codex->nb_coders);
     if (!generate_codex(codex))
 		return (0);
 	return (1);
