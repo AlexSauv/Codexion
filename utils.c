@@ -6,69 +6,68 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/20 13:33:40 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/21 15:52:09 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/22 16:11:12 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-int	get_priority_deadline(t_coder *coder, int dongle)
+int	get_priority_deadline(t_coder *coder, int dgl)
 {
 	t_codex		*codex;
+	t_heap		*heap;
 	int			i;
-	long		first_deadline;
-	long		second_deadline;
+	long		coder_id;
+	long		deadline;
 
-	i = 0;
+	i = 1;
 	codex = coder->codex;
-	first_deadline = coder->last_compile_start + codex->time_to_burnout;
-	while (i < codex->nb_coders)
+	heap = &codex->dongle_heaps[dgl];
+	coder_id = heap->req[0].coder_id;
+	deadline = heap->req[0].deadline;
+	while (i < heap->size)
 	{
-		if (codex->coders[i].id != coder->id)
+		if (heap->req[i].deadline < deadline 
+			|| (heap->req[i].deadline == deadline
+				&& heap->req[i].coder_id < coder_id))
 		{
-			if ((codex->coders[i].left_dongle == dongle)
-				|| codex->coders[i].right_dongle == dongle)
-			{
-				pthread_mutex_lock(&codex->events_mutex);
-				second_deadline = (codex->coders[i].last_compile_start
-						+ codex->time_to_burnout);
-				pthread_mutex_unlock(&codex->events_mutex);
-				if (second_deadline < first_deadline)
-					return (0);
-			}
+			coder_id = heap->req[i].coder_id;
+			deadline = heap->req[i].deadline;
 		}
 		i++;
 	}
-	return (1);
+	if (coder_id == coder->id)
+		return (1);
+	return (0);
 }
 
 int	first_to_request(t_coder *coder, int dongle)
 {
 	int			i;
-	long		coder_req;
-	long		second_req;
 	t_codex		*codex;
+    t_heap		*heap;
+	t_req		coder_req;
+	int			coder_id;
 
-	i = 0;
 	codex = coder->codex;
-    coder_req = coder->request;
-	while (i < codex->nb_coders)
+    heap = &codex->dongle_heaps[dongle];
+	if (!heap || heap->size == 0)
+	return (0);
+	i = 1;
+	coder_req = heap->req[0];
+	coder_id = heap->req[0].coder_id; 
+	while (i < heap->size)
 	{
-		if (codex->coders[i].id != coder->id)
+		if (heap->req[i].req_time < coder_req.req_time 
+			|| (heap->req[i].req_time == coder_req.req_time 
+				&& heap->req[i].coder_id < coder_id))
 		{
-            pthread_mutex_lock(&codex->events_mutex);
-            second_req = codex->coders[i].request;
-            pthread_mutex_unlock(&codex->events_mutex);
-			if ((codex->coders[i].left_dongle == dongle
-					|| codex->coders[i].right_dongle == dongle))
-			{
-				if (second_req > 0 && second_req < coder_req)
-					return (0);
-			}
+			coder_req = heap->req[i];
+			coder_id = heap->req[i].coder_id;
 		}
-        i++;
+		i++;
 	}
-	return (1);
+	return (coder_id == coder->id);
 }
 int	dongle_available(t_coder *coder, int dongle)
 {

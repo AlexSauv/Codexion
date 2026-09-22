@@ -6,18 +6,19 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 17:52:38 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/21 15:11:58 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/22 13:10:47 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
+
 
 static int	check_burnouts(t_codex *codex)
 {
 	int		i;
 	long	curr_time;
     long    last_comp;
-
+	
 	i = 0;
 	while (i < codex->nb_coders)
 	{
@@ -40,10 +41,10 @@ static int	check_compiles_done(t_codex *codex)
 	int	i;
 	long	comp_done;
 	long	comp_required;
-
+	
 	i = 0;
 	if (codex->nb_comp_required == -1)
-		return (0);
+	return (0);
 	while (i < codex->nb_coders)
 	{
 		pthread_mutex_lock(&codex->events_mutex);
@@ -51,12 +52,26 @@ static int	check_compiles_done(t_codex *codex)
 		comp_required = codex->nb_comp_required;
 		pthread_mutex_unlock(&codex->events_mutex);
 		if (comp_done < comp_required)
-			return (0);
+		return (0);
 		i++;
 	}
 	return (1);
 }
 
+int	codex_stopped(t_codex *codex)
+{
+	while(1)
+	{
+		if (check_burnouts(codex) || check_compiles_done(codex))
+		{
+			pthread_mutex_lock(&codex->events_mutex);
+			codex->simu_stopped = 1;
+			pthread_mutex_unlock(&codex->events_mutex);
+			return (1);
+		}
+	}
+	return (0);
+}
 void	*events_checker(void *arg)
 {
 	t_codex			*codex;
@@ -64,22 +79,11 @@ void	*events_checker(void *arg)
 	codex = (t_codex *) arg;
 	while (1)
 	{
-		if (check_burnouts(codex))
+		if (codex_stopped(codex))
+        {
+			pthread_cond_broadcast(codex->condi);
 			return (NULL);
-		if (check_compiles_done(codex))
-		{
-			pthread_mutex_lock(&codex->events_mutex);
-			codex->simu_stopped = 1;
-			pthread_mutex_unlock(&codex->events_mutex);
-			return (NULL);
-		}
-		pthread_mutex_lock(&codex->events_mutex);
-		if (codex->simu_stopped)
-		{
-			pthread_mutex_unlock(&codex->events_mutex);
-			break ;
-		}
-		pthread_mutex_unlock(&codex->events_mutex);
+        }
 		usleep(500);
 	}
 	return (NULL);

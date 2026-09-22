@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 16:00:11 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/21 17:38:28 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/22 16:23:56 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ int	generate_codex(t_codex *codex)
 			free_codex(codex);
 			return (0);
 		}
-		codex->dongle_heaps[i] = heap_create(codex->nb_coders);
+		codex->dongle_heaps = heap_create(codex->nb_coders);
 		codex->mutexes++;
 		codex->dongle_cooldowns[i] = 0;
 		i++;

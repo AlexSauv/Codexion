@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 18:55:13 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/21 17:44:46 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/22 16:21:30 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,109 +27,112 @@ static void	sort_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl)
 }
 
 
-static void	get_a_dongle_by_fifo(t_coder *coder, int dongle)
-{
-	t_codex		*codex;
-	long		curr_time;
-	long		wait_time;
+// static void	get_a_dongle_by_fifo(t_coder *coder, int dgl)
+// {
+// 	t_codex		*codex;
+// 	long		curr_time;
+// 	long		dead_time;
     
-	codex = coder->codex;
-	pthread_mutex_lock(&codex->events_mutex);
-	codex->total_request++;
-	coder->request = codex->total_request;
-	pthread_mutex_unlock(&codex->events_mutex);
-	while (!codex->simu_stopped)
-	{
-        pthread_mutex_lock(&codex->dongles[dongle]);
-		if (first_to_request(coder, dongle))
-		{
-            pthread_mutex_lock(&codex->events_mutex);
-			coder->request = 0;
-            pthread_mutex_unlock(&codex->events_mutex);
-			break ;
-		}
-        pthread_cond_wait(&codex->condi[dongle], &codex->dongles[dongle]);
-		pthread_mutex_unlock(&codex->dongles[dongle]);
-	}
-}
+// 	codex = coder->codex;
+// 	curr_time = get_current_time() - codex->start_at;
+// 	dead_time = curr_time - coder->last_compile_start;
+// 	pthread_mutex_lock(&codex->events_mutex);
+// 	update_req(&codex->dongle_heaps[dgl], coder->id, curr_time, dead_time);
+// 	pthread_mutex_unlock(&codex->events_mutex);
+// 	while (!codex_stopped(codex))
+// 	{
+//         pthread_mutex_lock(&codex->dongles[dgl]);
+// 		if (first_to_request(coder, dgl))
+// 		{
+//             remove_coder_req(codex, &codex->dongle_heaps[dgl], coder->id);
+// 			break ;
+// 		}
+//         pthread_cond_wait(&codex->condi[dgl], &codex->dongles[dgl]);
+// 		pthread_mutex_unlock(&codex->dongles[dgl]);
+// 	}
+// }
 
-static void	get_a_dongle_by_edf(t_coder *coder, int dongle)
-{
-    t_codex		*codex;
-	long		curr_time;
-	long		wait_time;
+// static void	get_a_dongle_by_edf(t_coder *coder, int dgl)
+// {
+//     t_codex		*codex;
+// 	long		curr_time;
     
+// 	codex = coder->codex;
+// 	while (!codex_stopped(codex))
+// 	{
+//         pthread_mutex_lock(&codex->dongles[dgl]);
+// 		curr_time = get_current_time() - codex->start_at;
+// 		if (curr_time >= codex->dongle_cooldowns[dgl])
+// 		{
+//             if (get_priority_deadline(coder, dgl))
+// 				break ;
+// 		}
+//         pthread_cond_wait(&codex->condi[dgl], &codex->dongles[dgl]);
+// 		pthread_mutex_unlock(&codex->dongles[dgl]);
+// 	}
+// }
+
+static void get_a_dongle(t_coder *coder, int dgl)
+{
+	t_codex *codex;
+	long	curr_time;
+	long	dead_time;
+
 	codex = coder->codex;
-	while (!codex->simu_stopped)
+	while (!codex_stopped(codex))
 	{
-        pthread_mutex_lock(&codex->dongles[dongle]);
+		pthread_mutex_lock(&codex->dongles[dgl]);
 		curr_time = get_current_time() - codex->start_at;
-		if (curr_time >= codex->dongle_cooldowns[dongle])
+		dead_time = coder->last_compile_start - codex->time_to_burnout;
+		pthread_mutex_lock(&codex->events_mutex);
+		update_req(&codex->dongle_heaps[dgl], coder->id, curr_time, dead_time);
+		pthread_mutex_unlock(&codex->events_mutex);
+		if (curr_time >= codex->dongle_cooldowns[dgl])
 		{
-            if (get_priority_deadline(coder, dongle))
-				break ;
+			if (strcmp(codex->scheduler, "fifo") && first_to_request(coder, dgl))
+				break;
+			if (strcmp(codex->scheduler, "edf") && get_priority_deadline(coder, dgl))
+				break;
 		}
-        pthread_cond_wait(&codex->condi[dongle], &codex->dongles[dongle]);
-		pthread_mutex_unlock(&codex->dongles[dongle]);
+		pthread_cond_wait(&codex->condi[dgl], &codex->dongles[dgl]);
+		pthread_mutex_unlock(&codex->dongles[dgl]);
 	}
+	remove_coder_req(codex, &codex->dongle_heaps[dgl], coder->id);
+	print_events(codex, coder->id, "has taken a dongle");
 }
 
-static int  get_second_dongle(t_coder *coder, int dongle)
-{
-    t_codex *codex;
-
-    codex = coder->codex;
-    if (dongle_available(coder, dongle))
-    {
-        if (strcmp(codex->scheduler, "fifo") == 0)
-        {
-            get_a_dongle_by_fifo(coder, dongle);
-            print_events(codex, coder->id, "has taken a dongle");
-            print_events(codex, coder->id, "has taken a dongle");
-        }
-        else
-        {
-            get_a_dongle_by_edf(coder, dongle);
-            print_events(codex, coder->id, "has taken a dongle");
-            print_events(codex, coder->id, "has taken a dongle");
-        }
-        return (1);
-    }
-    return (0);
-}
-
-void	get_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl)
+void	get_both_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl)
 {
 	t_codex		*codex;
 
 	codex = coder->codex;
     sort_dongles(coder, first_dgl, scnd_dgl);
-	while (!codex->simu_stopped)
+	while (!codex_stopped(codex))
 	{
-        if (codex->simu_stopped)
+		get_a_dongle(coder, *first_dgl);
+        if (dongle_available(coder, *scnd_dgl))
         {
-            pthread_mutex_unlock(&codex->dongles[*first_dgl]);
-            return ;
-        }
-        if (strcmp(codex->scheduler, "fifo") == 0)
-            get_a_dongle_by_fifo(coder, *first_dgl);
-        else
-            get_a_dongle_by_edf(coder, *first_dgl);
-        if (get_second_dongle(coder, *scnd_dgl))
-            break ;
-        else
-            pthread_mutex_unlock(&codex->dongles[*first_dgl]);
+			get_a_dongle(coder, *scnd_dgl);
+			break ;
+		}
+		else
+		{
+			pthread_mutex_unlock(&codex->dongles[*first_dgl]);
+			pthread_cond_broadcast(&codex->condi[*first_dgl]);
+		}
         usleep(500);
 	}
 }
 
 void	drop_dongles(t_codex *codex, int first_dgl, int scnd_dgl)
 {
-	codex->dongle_cooldowns[first_dgl] = (get_current_time() - codex->start_at);
-	codex->dongle_cooldowns[first_dgl] += codex->cooldown_dngl;
+	long	curr_time;
+
+	curr_time = (get_current_time() - codex->start_at);
+	codex->dongle_cooldowns[first_dgl] = curr_time + codex->cooldown_dngl;
 	pthread_mutex_unlock(&codex->dongles[first_dgl]);
     pthread_cond_broadcast(&codex->condi[first_dgl]);
-	codex->dongle_cooldowns[scnd_dgl] = (get_current_time() - codex->start_at);
+	curr_time = (get_current_time() - codex->start_at);
 	codex->dongle_cooldowns[scnd_dgl] += codex->cooldown_dngl;
 	pthread_mutex_unlock(&codex->dongles[scnd_dgl]);
     pthread_cond_broadcast(&codex->condi[scnd_dgl]);

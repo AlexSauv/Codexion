@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 15:01:47 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/21 17:27:28 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/22 16:26:07 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,23 +21,28 @@
 
 typedef struct s_codex	t_codex;
 typedef struct s_coder	t_coder;
+typedef struct s_heap	t_heap;
 int				args_checker(int argc, char **argv, t_codex *codex);
+t_heap			*heap_create(int capacity);
+void 			update_req(t_heap *heap, int coder_id, long req, long deadline);
+void			remove_coder_req(t_codex *codex, t_heap *heap, int coder_id);
 int				init_codex(t_codex *codex);
 long			get_current_time(void);
 void			*coder_events(void *arg);
 void			*events_checker(void *arg);
+int				codex_stopped(t_codex *codex);
 void			free_codex(t_codex *codex);
 void			print_events(t_codex *codex, int coder_id, char *status);
 int				get_priority_deadline(t_coder *coder, int dongle);
 int				first_to_request(t_coder *coder, int dongle);
 int				dongle_available(t_coder *coder, int dongle);
-void			get_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl);
+void			get_both_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl);
 void			drop_dongles(t_codex *codex, int first_dgl, int scnd_dgl);
 
 typedef struct s_req
 {
 	int				coder_id;
-	long			arrival_time;
+	long			req_time;
 	long			deadline;
 }	t_req;
 

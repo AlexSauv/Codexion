@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/20 14:01:56 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/21 17:10:21 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/22 16:22:11 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void	*coder_events(void *arg)
 	codex = coder->codex;
 	while (!codex->simu_stopped)
 	{
-		get_dongles(coder, &first, &second);
+		get_both_dongles(coder, &first, &second);
 		compiling_phase(coder, first, second);
 		debugging_and_refacto_phase(coder, "debug");
 		debugging_and_refacto_phase(coder, "refacto");
