@@ -26,16 +26,15 @@ void	print_events(t_codex *codex, int coder_id, char *status)
 	long	curr_time;
 
 	pthread_mutex_lock(&codex->events_mutex);
-	if (!codex_stopped(codex))
+	if (strcmp(status, "burned out") == 0)
 	{
 		curr_time = get_current_time() - codex->start_at;
-		if (strcmp(status, "burned out") == 0)
-		{
-			printf("%ld %d burned out\n", curr_time, coder_id);
-			codex->simu_stopped = 1;
-		}
-		else
-			printf("%ld %d %s\n", curr_time, coder_id, status);
+		printf("%ld %d burned out\n", curr_time, coder_id);
+	}
+	else if (!codex->simu_stopped)
+	{
+		curr_time = get_current_time() - codex->start_at;
+		printf("%ld %d %s\n", curr_time, coder_id, status);
 	}
 	pthread_mutex_unlock(&codex->events_mutex);
 }

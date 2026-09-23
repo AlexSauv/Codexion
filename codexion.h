@@ -24,6 +24,7 @@ typedef struct s_coder	t_coder;
 typedef struct s_heap	t_heap;
 int				args_checker(int argc, char **argv, t_codex *codex);
 t_heap			*heap_create(int capacity);
+void			heap_freed(t_heap *heap);
 void 			update_req(t_heap *heap, int coder_id, long req, long deadline);
 void			remove_coder_req(t_codex *codex, t_heap *heap, int coder_id);
 int				init_codex(t_codex *codex);
@@ -36,7 +37,7 @@ void			print_events(t_codex *codex, int coder_id, char *status);
 int				get_priority(t_coder *coder, int dongle);
 int				first_to_req(t_coder *coder, int dongle);
 int				dongle_available(t_coder *coder, int dongle);
-void			get_both_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl);
+int				get_both_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl);
 void			drop_dongles(t_codex *codex, int first_dgl, int scnd_dgl);
 
 typedef struct s_req
@@ -49,6 +50,7 @@ typedef struct s_req
 typedef struct s_heap
 {
 	t_req	*req;
+	int		*coder_ids;
 	int		capacity;
 	int		size;
 }	t_heap;

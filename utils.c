@@ -70,9 +70,7 @@ int	dongle_available(t_coder *coder, int dongle)
 {
 	t_codex *codex;
 	long	curr_time;
-	int		ready;
 
-    ready = 0;
 	codex = coder->codex;
 	curr_time = get_current_time() - codex->start_at;
 	if (curr_time < codex->dongle_cooldowns[dongle])

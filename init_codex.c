@@ -41,7 +41,8 @@ void	free_codex(t_codex *codex)
         i = 0;
         while (i < codex->nb_coders)
         {
-            free(&codex->dongle_heaps[i]);
+            if(codex->dongle_heaps[i])
+				heap_freed(codex->dongle_heaps[i]);
             i++;
         }
         free(codex->dongle_heaps);

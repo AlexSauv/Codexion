@@ -52,9 +52,16 @@ void	*coder_events(void *arg)
 
 	coder = (t_coder *) arg;
 	codex = coder->codex;
+	if (codex->nb_coders == 1)
+	{
+		while (!codex_stopped(codex))
+			usleep(1000);
+		return (NULL);
+	}
 	while (!codex_stopped(codex))
 	{
-		get_both_dongles(coder, &first, &second);
+		if (get_both_dongles(coder, &first, &second))
+			break ;
 		compiling_phase(coder, first, second);
 		debugging_and_refacto_phase(coder, "debug");
 		debugging_and_refacto_phase(coder, "refacto");

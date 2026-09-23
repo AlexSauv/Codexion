@@ -30,6 +30,16 @@ t_heap	*heap_create(int capacity)
 	return (heap);
 }
 
+void	heap_freed(t_heap *heap)
+{
+	if(heap)
+	{
+		if(heap->req)
+			free(heap->req);
+		free(heap);
+	}
+}
+
 void	remove_coder_req(t_codex *codex, t_heap *heap, int coder_id)
 {
 	int	i;
