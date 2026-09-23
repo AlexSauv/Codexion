@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 16:00:11 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/22 18:20:02 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/23 13:47:30 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,8 @@ void	free_codex(t_codex *codex)
         }
         free(codex->dongle_heaps);
     }
-	if (codex->dongle_cooldowns)
-		free(codex->dongle_cooldowns);
+	if (codex->dgl_cldwns)
+		free(codex->dgl_cldwns);
 	if (codex->coders)
 		free(codex->coders);
 	pthread_mutex_destroy(&codex->events_mutex);
@@ -93,7 +93,7 @@ int	generate_codex(t_codex *codex)
 		}
 		codex->dongle_heaps[i] = heap_create(codex->nb_coders);
 		codex->mutexes++;
-		codex->dongle_cooldowns[i] = 0;
+		codex->dgl_cldwns[i] = 0;
 		i++;
 	}
 	init_coders(codex);
@@ -109,13 +109,13 @@ int	init_codex(t_codex *codex)
 		return (0);
 	}
 	memset(codex->dongles, 0, sizeof(pthread_mutex_t) * codex->nb_coders);
-	codex->dongle_cooldowns = malloc(sizeof(long) * codex->nb_coders);
-	if (!codex->dongle_cooldowns)
+	codex->dgl_cldwns = malloc(sizeof(long) * codex->nb_coders);
+	if (!codex->dgl_cldwns)
 	{
 		fprintf(stderr, "[ERROR] Dongle cooldowns memory allocation failed.");
 		return (0);
 	}
-	memset(codex->dongle_cooldowns, 0, sizeof(long) * codex->nb_coders);
+	memset(codex->dgl_cldwns, 0, sizeof(long) * codex->nb_coders);
 	codex->coders = malloc(sizeof(t_coder) * codex->nb_coders);
 	if (!codex->coders)
 	{

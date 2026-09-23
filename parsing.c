@@ -6,13 +6,13 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 15:01:43 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/18 15:25:38 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/23 13:48:27 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-static int	scheduler_checker(char *str)
+static int	find_scheduler_mode(char *str)
 {
 	if (strcmp(str, "fifo") == 0)
 		return (1);
@@ -45,7 +45,7 @@ static void	init_simu(t_codex *codex, char **argv)
 	codex->time_to_debug = atoi(argv[4]);
 	codex->time_to_refactor = atoi(argv[5]);
 	codex->nb_comp_required = atoi(argv[6]);
-	codex->cooldown_dngl = atoi(argv[7]);
+	codex->cldwn_dgl = atoi(argv[7]);
 	codex->scheduler = argv[8];
 }
 
@@ -68,7 +68,7 @@ int	args_checker(int argc, char **argv, t_codex *codex)
 			return (0);
 		}
 	}
-	if (!scheduler_checker(argv[8]))
+	if (!find_scheduler_mode(argv[8]))
 	{
 		fprintf(stderr, "[ERROR][PARSING] The scheduler must be"
 			" either 'fifo' or 'edf'.\n");

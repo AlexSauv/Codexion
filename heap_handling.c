@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/22 12:29:23 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/22 17:11:05 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/23 13:39:27 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ static int find_coder_pos(t_heap *heap, int coder_id)
 	return (-1);
 }
 
-void	remove_coder_req(t_codex *codex, t_heap *heap, int coder_id)
+void	remove_req(t_codex *codex, t_heap *heap, int coder_id)
 {
 	int	i;
 	int	last;
