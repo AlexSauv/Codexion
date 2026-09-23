@@ -42,7 +42,7 @@ static int	check_compiles_done(t_codex *codex)
 	
 	i = 0;
 	if (codex->nb_comp_required == -1)
-	return (0);
+		return (0);
 	while (i < codex->nb_coders)
 	{
 		comp_done = codex->coders[i].nb_compile_done;

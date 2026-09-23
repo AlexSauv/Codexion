@@ -12,6 +12,18 @@
 
 #include "codexion.h"
 
+int check_coder_priority(t_codex *codex, t_req *req_one, t_req *req_two)
+{
+	if (strcmp(codex->scheduler, "fifo") == 0)
+	{
+		if (req_one->req_time != req_two->req_time)
+			return (req_one->req_time < req_two->req_time);
+	}
+	if (req_one->deadline != req_two->deadline)
+		return (req_one->deadline < req_two->deadline);
+	return (req_one->coder_id < req_two->coder_id);
+}
+
 int	get_priority(t_coder *coder, int dgl)
 {
 	t_codex		*codex;
@@ -70,10 +82,13 @@ int	dongle_available(t_coder *coder, int dongle)
 {
 	t_codex *codex;
 	long	curr_time;
+	long	cooldown;
 
 	codex = coder->codex;
+	cooldown = codex->dongle_cooldowns[dongle];
+	pthread_mutex_unlock(&codex->dongles[dongle]);
 	curr_time = get_current_time() - codex->start_at;
-	if (curr_time < codex->dongle_cooldowns[dongle])
+	if (curr_time < cooldown)
 		return (0);
 	return (1);
 }

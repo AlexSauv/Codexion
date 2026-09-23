@@ -12,77 +12,97 @@
 
 #include "codexion.h"
 
-t_heap	*heap_create(int capacity)
+static int move_up(t_codex *codex, t_heap *heap, int i)
 {
-	t_heap	*heap;
+	int	before;
 
-	heap = malloc(sizeof(t_heap));
-	if (!heap)
-		return (NULL);
-	heap->req = malloc(sizeof(t_req) * capacity);
-	if (!heap->req)
+	while (i > 0)
 	{
-		free(heap);
-		return (NULL);
+		before = (i - 1) / 2;
+		if (!check_coder_priority(codex, &heap->req[i], &heap->req[before]))
+			break ;
+		heap_swap(heap, i, before);
+		i = before;
 	}
-	heap->capacity = capacity;
-	heap->size = 0;
-	return (heap);
+	return (i);
 }
 
-void	heap_freed(t_heap *heap)
+static int move_down(t_codex *codex, t_heap *heap, int i)
 {
-	if(heap)
+	int	left;
+	int	right;
+	int choice;
+
+	while (1)
 	{
-		if(heap->req)
-			free(heap->req);
-		free(heap);
+		left = 2 * i + 1;
+		right = 2 * i + 2;
+		choice = i;
+		if (left < heap->size && check_coder_priority(codex, &heap->req[left], &heap->req[choice]))
+			choice = left;
+		if (right < heap->size && check_coder_priority(codex, &heap->req[right], &heap->req[choice]))
+			choice = right;
+		if (choice == i)
+			break ;
+		heap_swap(heap, i , choice);
+		i = choice;
 	}
+	return (i);
+}
+
+static int find_coder_pos(t_heap *heap, int coder_id)
+{
+	int	i;
+
+	i = 0;
+	while (i < heap->size)
+	{
+		if (heap->req[i].coder_id == coder_id)
+			return (i);
+		i++;
+	}
+	return (-1);
 }
 
 void	remove_coder_req(t_codex *codex, t_heap *heap, int coder_id)
 {
 	int	i;
+	int	last;
 
-	i = 0;
-	pthread_mutex_lock(&codex->events_mutex);
-	while (i < heap->size)
+	i = find_coder_pos(heap, coder_id);
+	if (i == -1)
+		return ;
+	last = heap->size - 1;
+	heap->req[i] = heap->req[last];
+	heap->size--;
+	if (i < heap->size)
 	{
-		if (heap->req[i].coder_id == coder_id)
-		{
-			while (i < heap->size - 1)
-			{
-				heap->req[i] = heap->req[i + 1];
-				i++;
-			}
-			heap->size--;
-			break ;
-		}
-		i++;
+		i = move_up(codex, heap, i);
+		move_down(codex, heap, i);
 	}
 	pthread_mutex_unlock(&codex->events_mutex);
 }
 
-void 	update_req(t_heap *heap, int coder_id, long req, long deadline)
+void 	update_req(t_codex *codex, t_heap *heap, t_req new_req)
 {
 	int	i;
 	
-	i = 0;
-	while (i < heap->size)
+	i = find_coder_pos(heap, new_req.coder_id);
+	if (i == -1)
 	{
-		if (heap->req[i].coder_id == coder_id)
-		{
-			heap->req[i].req_time = req;
-			heap->req[i].deadline = deadline;
+		if (heap->size >= heap->capacity)
 			return ;
-		}
-		i++;
-	}
-	if (heap->size < heap->capacity)
-	{
-		heap->req[heap->size].coder_id = coder_id;
-		heap->req[heap->size].req_time = req;
-		heap->req[heap->size].deadline = deadline;
+		i = heap->size;
 		heap->size++;
 	}
+	heap->req[i] = new_req;
+	i = move_up(codex, heap, i);
+	move_down(codex, heap, i);
+}
+
+int	get_coder_id(t_heap *heap)
+{
+	if(heap->size == 0)
+		return (-1);
+	return (heap->req[0].coder_id);
 }

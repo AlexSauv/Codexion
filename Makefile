@@ -9,7 +9,8 @@ SRCS = parsing.c \
 	codexion.c \
 	dongle_handling.c \
 	event_handling.c \
-	heap_handling.c
+	heap_handling.c \
+	heap_init.c
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
 .PHONY: all clean fclean re
