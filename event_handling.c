@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/20 14:01:56 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/22 18:23:54 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/23 14:42:11 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,12 +45,12 @@ static void	debugging_and_refacto_phase(t_coder *coder, char *mode)
 
 void	*coder_events(void *arg)
 {
-	t_coder		*coder;
-	t_codex		*codex;
-	int			first;
-	int			second;
+	t_coder	*coder;
+	t_codex	*codex;
+	int		first;
+	int		second;
 
-	coder = (t_coder *) arg;
+	coder = (t_coder *)arg;
 	codex = coder->codex;
 	if (codex->nb_coders == 1)
 	{

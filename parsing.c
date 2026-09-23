@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 15:01:43 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/23 13:48:27 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/23 14:42:24 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ static int	find_scheduler_mode(char *str)
 
 static int	digits_checker(char *str)
 {
-	int		i;
+	int	i;
 
 	i = 0;
 	if (!str || str[0] == '\0')
@@ -63,15 +63,18 @@ int	args_checker(int argc, char **argv, t_codex *codex)
 	{
 		if (!digits_checker(argv[i]))
 		{
-			fprintf(stderr, "[ERROR][PARSING] Invalid Format, "
-				"Argument %d must be a positive digit.\n", i);
+			fprintf(stderr,
+					"[ERROR][PARSING] Invalid Format, "
+					"Argument %d must be a positive digit.\n",
+					i);
 			return (0);
 		}
 	}
 	if (!find_scheduler_mode(argv[8]))
 	{
-		fprintf(stderr, "[ERROR][PARSING] The scheduler must be"
-			" either 'fifo' or 'edf'.\n");
+		fprintf(stderr,
+				"[ERROR][PARSING] The scheduler must be"
+				" either 'fifo' or 'edf'.\n");
 		return (0);
 	}
 	init_simu(codex, argv);

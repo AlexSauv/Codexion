@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 15:01:47 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/23 13:50:09 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/23 14:33:53 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void					heap_swap(t_heap *heap, int req_one, int req_two);
 void					update_req(t_codex *codex, t_heap *heap, t_req new_req);
 void					remove_req(t_codex *codex, t_heap *heap, int coder_id);
 int						get_coder_id(t_heap *heap);
+int						check_coder_id(t_coder *coder, int dgl);
 int						init_codex(t_codex *codex);
 long					get_current_time(void);
 void					*coder_events(void *arg);
@@ -39,7 +40,7 @@ int						codex_stopped(t_codex *codex);
 void					free_codex(t_codex *codex);
 void					print_events(t_codex *codex, int coder_id,
 							char *status);
-int						get_priority(t_codex *codex, t_req *first, t_req *scnd);
+int						check_priority(t_codex *codex, t_req *first, t_req *scnd);
 int						dongle_available(t_coder *coder, int dongle);
 int						get_both_dongles(t_coder *coder, int *first_dgl,
 							int *scnd_dgl);

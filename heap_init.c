@@ -1,4 +1,4 @@
-# include "codexion.h"
+#include "codexion.h"
 
 t_heap	*heap_create(int capacity)
 {
@@ -20,19 +20,19 @@ t_heap	*heap_create(int capacity)
 
 void	heap_freed(t_heap *heap)
 {
-	if(heap)
+	if (heap)
 	{
-		if(heap->req)
+		if (heap->req)
 			free(heap->req);
 		free(heap);
 	}
 }
 
-void heap_swap(t_heap *heap, int req_one, int req_two)
+void	heap_swap(t_heap *heap, int req_one, int req_two)
 {
-    t_req   tmp;
+	t_req tmp;
 
-    tmp = heap->req[req_one];
-    heap->req[req_one] = heap->req[req_two];
-    heap->req[req_two] = tmp;
+	tmp = heap->req[req_one];
+	heap->req[req_one] = heap->req[req_two];
+	heap->req[req_two] = tmp;
 }

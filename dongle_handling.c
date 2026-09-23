@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 18:55:13 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/23 13:49:01 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/23 14:33:48 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ static int	get_a_dongle(t_coder *coder, int dgl)
 		pthread_mutex_lock(&codex->events_mutex);
 		update_req(codex, codex->dongle_heaps[dgl], (t_req){coder->id,
 			curr_time, dead_time});
-		if (curr_time >= codex->dgl_cldwns[dgl] && check_scheduler(coder, dgl))
+		if (curr_time >= codex->dgl_cldwns[dgl] && check_coder_id(coder, dgl))
 			took_it = 1;
 		pthread_mutex_unlock(&codex->events_mutex);
 		if (took_it)
