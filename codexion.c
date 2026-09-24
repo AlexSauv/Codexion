@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 16:50:44 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/24 16:52:07 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/24 20:11:37 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,18 +31,23 @@ static int	args_validator(int argc, char **argv, t_codex *codex)
 	return (1);
 }
 
-static void	create_threads(t_codex *codex, pthread_t *monitor_thread)
+static long	create_threads(t_codex *codex)
 {
 	long	i;
 
 	i = 0;
 	while (i < codex->nb_coders)
 	{
-		pthread_create(&codex->coders[i].thread, NULL, coder_events,
-			&codex->coders[i]);
+		if (pthread_create(&codex->coders[i].thread, NULL, coder_events,
+				&codex->coders[i]) != 0)
+		{
+			fprintf(stderr, "[ERROR] pthread_create failed for coder %ld\n", i
+				+ 1);
+			return (i);
+		}
 		i++;
 	}
-	pthread_create(monitor_thread, NULL, events_checker, &codex);
+	return (i);
 }
 
 static void	joining_threads(t_codex *codex, pthread_t monitor_thread)
@@ -58,6 +63,31 @@ static void	joining_threads(t_codex *codex, pthread_t monitor_thread)
 	pthread_join(monitor_thread, NULL);
 }
 
+static int	launch_codex(t_codex *codex)
+{
+	pthread_t	monitor;
+	long		coders;
+	int			monitor_valid;
+
+	coders = create_threads(codex);
+	monitor_valid = 0;
+	if (coders == codex->nb_coders)
+	{
+		monitor_valid = (pthread_create(monitor, NULL, events_checker,
+					&codex) == 0);
+	}
+	if (coders < codex->nb_coders || !monitor_valid)
+	{
+		pthread_mutex_lock(&codex->events_mutex);
+		codex->simu_stopped = 1;
+		pthread_mutex_unlock(&codex->events_mutex);
+	}
+	joining_threads(&codex, monitor);
+	if (monitor_valid)
+		pthread_join(monitor, NULL);
+	return (coders == codex->nb_coders && monitor_valid);
+}
+
 int	main(int argc, char **argv)
 {
 	t_codex		codex;
@@ -65,20 +95,17 @@ int	main(int argc, char **argv)
 
 	if (!args_validator(argc, argv, &codex))
 		return (1);
-	codex.dongles = NULL;
-	codex.dgl_cldwns = NULL;
-	codex.coders = NULL;
-	codex.condi = NULL;
-	codex.dgl_heaps = NULL;
-	codex.mutexes = 0;
 	pthread_mutex_init(&codex.events_mutex, NULL);
 	if (!init_codex(&codex))
 	{
 		pthread_mutex_destroy(&codex.events_mutex);
 		return (1);
 	}
-	create_threads(&codex, &monitor_thread);
-	joining_threads(&codex, monitor_thread);
+	if (!launch_codex(&codex))
+	{
+		free_codex(&codex);
+		return (1);
+	}
 	free_codex(&codex);
 	return (0);
 }

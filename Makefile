@@ -6,7 +6,7 @@ SRCS = parsing.c \
 	utils.c\
 	time_handling.c \
 	checker_state.c \
-	init_codex.c \
+	codex_init.c \
 	codexion.c \
 	dongle_handling.c \
 	event_handling.c \

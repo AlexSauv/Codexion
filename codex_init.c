@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init_codex.c                                       :+:      :+:    :+:   */
+/*   codex_init.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 16:00:11 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/24 17:07:35 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/24 20:13:19 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,45 +65,28 @@ int	generate_codex(t_codex *codex)
 
 int	init_codex(t_codex *codex)
 {
+	codex->dongles = NULL;
+	codex->dgl_cldwns = NULL;
+	codex->coders = NULL;
+	codex->condi = NULL;
+	codex->dgl_heaps = NULL;
+	codex->mutexes = 0;
 	codex->dongles = malloc(sizeof(pthread_mutex_t) * codex->nb_coders);
-	if (!codex->dongles)
+	codex->dgl_cldwns = malloc(sizeof(long) * codex->nb_coders);
+	codex->coders = malloc(sizeof(t_coder) * codex->nb_coders);
+	codex->condi = malloc(sizeof(pthread_cond_t) * codex->nb_coders);
+	codex->dgl_heaps = malloc(sizeof(t_heap *) * codex->nb_coders);
+	if (!codex->dongles || !codex->dgl_cldwns || !codex->coders
+		|| !codex->condi || !codex->dgl_heaps)
 	{
-		fprintf(stderr, "[ERROR] Dongles memory allocation failed.\n");
+		fprintf(stderr, "[ERROR] Memory allocation failed.\n");
 		free_codex(codex);
 		return (0);
 	}
 	memset(codex->dongles, 0, sizeof(pthread_mutex_t) * codex->nb_coders);
-	codex->dgl_cldwns = malloc(sizeof(long) * codex->nb_coders);
-	if (!codex->dgl_cldwns)
-	{
-		fprintf(stderr, "[ERROR] Dongle cooldowns memory allocation failed.\n");
-		free_codex(codex);
-		return (0);
-	}
 	memset(codex->dgl_cldwns, 0, sizeof(long) * codex->nb_coders);
-	codex->coders = malloc(sizeof(t_coder) * codex->nb_coders);
-	if (!codex->coders)
-	{
-		fprintf(stderr, "[ERROR] Coders memory allocation failed.\n");
-		free_codex(codex);
-		return (0);
-	}
 	memset(codex->coders, 0, sizeof(t_coder) * codex->nb_coders);
-	codex->condi = malloc(sizeof(pthread_cond_t) * codex->nb_coders);
-	if (!codex->condi)
-	{
-		fprintf(stderr, "[ERROR] Conds memory allocation failed.\n");
-		free_codex(codex);
-		return (0);
-	}
 	memset(codex->condi, 0, sizeof(pthread_cond_t) * codex->nb_coders);
-	codex->dgl_heaps = malloc(sizeof(t_heap *) * codex->nb_coders);
-	if (!codex->dgl_heaps)
-	{
-		fprintf(stderr, "[ERROR] Dongle heaps memory allocation failed.\n");
-		free_codex(codex);
-		return (0);
-	}
 	memset(codex->dgl_heaps, 0, sizeof(t_heap *) * codex->nb_coders);
 	if (!generate_codex(codex))
 		return (0);
