@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 18:55:13 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/24 16:03:57 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/24 17:03:54 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,11 +72,11 @@ int	get_both_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl)
 	sort_dongles(coder, first_dgl, scnd_dgl);
 	while (!codex_stopped(codex))
 	{
-		if (dongle_free(coder, *first_dgl))
+		if (dgl_is_free(coder, *first_dgl))
 		{
 			if (!get_a_dongle(coder, *first_dgl))
 				return (0);
-			if (dongle_free(coder, *scnd_dgl) && get_a_dongle(coder, *scnd_dgl))
+			if (dgl_is_free(coder, *scnd_dgl) && get_a_dongle(coder, *scnd_dgl))
 				return (1);
 			pthread_mutex_unlock(&codex->dongles[*first_dgl]);
 			pthread_cond_broadcast(&codex->condi[*first_dgl]);

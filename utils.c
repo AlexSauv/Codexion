@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/20 13:33:40 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/24 16:04:13 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/24 17:03:23 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int	check_coder_id(t_coder *coder, int dgl)
 	return (get_coder_id(codex->dgl_heaps[dgl]) == coder->id);
 }
 
-int	dongle_free(t_coder *coder, int dongle)
+int	dgl_is_free(t_coder *coder, int dongle)
 {
 	t_codex	*codex;
 	long	curr_time;

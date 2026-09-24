@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 16:50:44 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/24 15:49:31 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/24 16:52:07 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,12 @@ int	main(int argc, char **argv)
 
 	if (!args_validator(argc, argv, &codex))
 		return (1);
+	codex.dongles = NULL;
+	codex.dgl_cldwns = NULL;
+	codex.coders = NULL;
+	codex.condi = NULL;
+	codex.dgl_heaps = NULL;
+	codex.mutexes = 0;
 	pthread_mutex_init(&codex.events_mutex, NULL);
 	if (!init_codex(&codex))
 	{

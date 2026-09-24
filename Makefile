@@ -2,6 +2,7 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror -MMD -MP -g3 -pthread
 NAME = codexion
 SRCS = parsing.c \
+	free_utils.c \
 	utils.c\
 	time_handling.c \
 	checker_state.c \
