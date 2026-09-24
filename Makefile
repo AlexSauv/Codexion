@@ -1,5 +1,5 @@
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -MMD -MP -g3
+CFLAGS = -Wall -Wextra -Werror -MMD -MP -g3 -pthread
 NAME = codexion
 SRCS = parsing.c \
 	utils.c\

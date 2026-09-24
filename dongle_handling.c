@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 18:55:13 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/23 14:33:48 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/24 16:03:57 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,35 +26,24 @@ static void	sort_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl)
 	}
 }
 
-// static int check_scheduler(t_coder *coder, int dgl)
-// {
-// 	t_codex *codex;
-
-// 	codex = coder->codex;
-// 	if (strcmp(codex->scheduler, "fifo") == 0)
-// 		return (first_to_req(coder, dgl));
-// 	return (get_priority(coder, dgl));
-// }
-
 static int	get_a_dongle(t_coder *coder, int dgl)
 {
-	t_codex	*codex;
-	long	curr_time;
-	long	dead_time;
-	int		took_it;
-	struct	timespec	ts;
+	t_codex			*codex;
+	long			now;
+	long			dead;
+	int				took_it;
+	struct timespec	ts;
 
 	codex = coder->codex;
 	took_it = 0;
 	while (!codex_stopped(codex))
 	{
 		pthread_mutex_lock(&codex->dongles[dgl]);
-		curr_time = get_current_time() - codex->start_at;
-		dead_time = coder->last_compile_start + codex->time_to_burnout;
+		now = get_current_time() - codex->start_at;
+		dead = coder->last_compile_start + codex->time_to_burnout;
 		pthread_mutex_lock(&codex->events_mutex);
-		update_req(codex, codex->dongle_heaps[dgl], (t_req){coder->id,
-			curr_time, dead_time});
-		if (curr_time >= codex->dgl_cldwns[dgl] && check_coder_id(coder, dgl))
+		update_req(codex, codex->dgl_heaps[dgl], (t_req){coder->id, now, dead});
+		if (now >= codex->dgl_cldwns[dgl] && check_coder_id(coder, dgl))
 			took_it = 1;
 		pthread_mutex_unlock(&codex->events_mutex);
 		if (took_it)
@@ -63,7 +52,7 @@ static int	get_a_dongle(t_coder *coder, int dgl)
 		pthread_cond_timedwait(&codex->condi[dgl], &codex->dongles[dgl], &ts);
 		pthread_mutex_unlock(&codex->dongles[dgl]);
 	}
-	remove_req(codex, codex->dongle_heaps[dgl], coder->id);
+	remove_req(codex, codex->dgl_heaps[dgl], coder->id);
 	if (took_it)
 		print_events(codex, coder->id, "has taken a dongle");
 	return (took_it);
@@ -83,12 +72,11 @@ int	get_both_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl)
 	sort_dongles(coder, first_dgl, scnd_dgl);
 	while (!codex_stopped(codex))
 	{
-		if (dongle_available(coder, *first_dgl))
+		if (dongle_free(coder, *first_dgl))
 		{
 			if (!get_a_dongle(coder, *first_dgl))
 				return (0);
-			if (dongle_available(coder, *scnd_dgl) && get_a_dongle(coder,
-					*scnd_dgl))
+			if (dongle_free(coder, *scnd_dgl) && get_a_dongle(coder, *scnd_dgl))
 				return (1);
 			pthread_mutex_unlock(&codex->dongles[*first_dgl]);
 			pthread_cond_broadcast(&codex->condi[*first_dgl]);

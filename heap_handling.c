@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/22 12:29:23 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/23 14:32:21 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/24 15:42:27 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,11 +99,4 @@ void	update_req(t_codex *codex, t_heap *heap, t_req new_req)
 	heap->req[i] = new_req;
 	i = move_up(codex, heap, i);
 	move_down(codex, heap, i);
-}
-
-int	get_coder_id(t_heap *heap)
-{
-	if (heap->size == 0)
-		return (-1);
-	return (heap->req[0].coder_id);
 }

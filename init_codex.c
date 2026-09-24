@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 16:00:11 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/23 14:42:20 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/24 15:56:26 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,16 +36,16 @@ void	free_codex(t_codex *codex)
 		}
 		free(codex->condi);
 	}
-	if (codex->dongle_heaps)
+	if (codex->dgl_heaps)
 	{
 		i = 0;
 		while (i < codex->nb_coders)
 		{
-			if (codex->dongle_heaps[i])
-				heap_freed(codex->dongle_heaps[i]);
+			if (codex->dgl_heaps[i])
+				heap_freed(codex->dgl_heaps[i]);
 			i++;
 		}
-		free(codex->dongle_heaps);
+		free(codex->dgl_heaps);
 	}
 	if (codex->dgl_cldwns)
 		free(codex->dgl_cldwns);
@@ -91,7 +91,7 @@ int	generate_codex(t_codex *codex)
 			free_codex(codex);
 			return (0);
 		}
-		codex->dongle_heaps[i] = heap_create(codex->nb_coders);
+		codex->dgl_heaps[i] = heap_create(codex->nb_coders);
 		codex->mutexes++;
 		codex->dgl_cldwns[i] = 0;
 		i++;
@@ -130,7 +130,7 @@ int	init_codex(t_codex *codex)
 		return (0);
 	}
 	memset(codex->condi, 0, sizeof(pthread_cond_t) * codex->nb_coders);
-	codex->dongle_heaps = malloc(sizeof(t_heap *) * codex->nb_coders);
+	codex->dgl_heaps = malloc(sizeof(t_heap *) * codex->nb_coders);
 	if (!generate_codex(codex))
 		return (0);
 	return (1);

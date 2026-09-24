@@ -6,23 +6,30 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/20 13:33:40 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/23 14:51:02 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/24 16:04:13 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-int	check_priority(t_codex *codex, t_req *first, t_req *scnd)
+int	check_priority(t_codex *cdx, t_req *frst, t_req *scnd)
 {
-	if (strcmp(codex->scheduler, "fifo") == 0)
+	if (strcmp(cdx->scheduler, "fifo") == 0)
 	{
-		if (first->req_time != scnd->req_time)
-			return (first->req_time < scnd->req_time);
-		return (first->coder_id < scnd->coder_id);
+		if (frst->req_time != scnd->req_time)
+			return (frst->req_time < scnd->req_time);
+		return (frst->coder_id < scnd->coder_id);
 	}
-	if (first->deadline != scnd->deadline)
-		return (first->deadline < scnd->deadline);
-	return (first->coder_id < scnd->coder_id);
+	if (frst->deadline != scnd->deadline)
+		return (frst->deadline < scnd->deadline);
+	return (frst->coder_id < scnd->coder_id);
+}
+
+int	get_coder_id(t_heap *heap)
+{
+	if (heap->size == 0)
+		return (-1);
+	return (heap->req[0].coder_id);
 }
 
 int	check_coder_id(t_coder *coder, int dgl)
@@ -30,10 +37,10 @@ int	check_coder_id(t_coder *coder, int dgl)
 	t_codex	*codex;
 
 	codex = coder->codex;
-	return (get_coder_id(codex->dongle_heaps[dgl])  == coder->id);
+	return (get_coder_id(codex->dgl_heaps[dgl]) == coder->id);
 }
 
-int	dongle_available(t_coder *coder, int dongle)
+int	dongle_free(t_coder *coder, int dongle)
 {
 	t_codex	*codex;
 	long	curr_time;
@@ -47,4 +54,22 @@ int	dongle_available(t_coder *coder, int dongle)
 	if (curr_time < cooldown)
 		return (0);
 	return (1);
+}
+
+void	print_events(t_codex *cdx, int id, char *status)
+{
+	long	curr_time;
+
+	pthread_mutex_lock(&cdx->events_mutex);
+	if (strcmp(status, "burned out") == 0)
+	{
+		curr_time = get_current_time() - cdx->start_at;
+		printf("%ld %d burned out\n", curr_time, id);
+	}
+	else if (!cdx->simu_stopped)
+	{
+		curr_time = get_current_time() - cdx->start_at;
+		printf("%ld %d %s\n", curr_time, id, status);
+	}
+	pthread_mutex_unlock(&cdx->events_mutex);
 }

@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 15:01:47 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/23 14:33:53 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/24 16:04:26 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,9 @@ void					*coder_events(void *arg);
 void					*events_checker(void *arg);
 int						codex_stopped(t_codex *codex);
 void					free_codex(t_codex *codex);
-void					print_events(t_codex *codex, int coder_id,
-							char *status);
-int						check_priority(t_codex *codex, t_req *first, t_req *scnd);
-int						dongle_available(t_coder *coder, int dongle);
+void					print_events(t_codex *cdx, int id, char *status);
+int						check_priority(t_codex *cdx, t_req *frst, t_req *scnd);
+int						dongle_free(t_coder *coder, int dongle);
 int						get_both_dongles(t_coder *coder, int *first_dgl,
 							int *scnd_dgl);
 void					drop_dongles(t_codex *codex, int first_dgl,
@@ -94,7 +93,7 @@ typedef struct s_codex
 	pthread_mutex_t		*dongles;
 	pthread_cond_t		*condi;
 	long				*dgl_cldwns;
-	t_heap				**dongle_heaps;
+	t_heap				**dgl_heaps;
 	long				total_request;
 
 	t_coder				*coders;

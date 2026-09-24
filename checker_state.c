@@ -6,24 +6,23 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 17:52:38 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/22 18:16:38 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/24 15:41:49 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-
 static int	check_burnouts(t_codex *codex, int *burned_coder)
 {
 	int		i;
 	long	curr_time;
-    long    last_comp;
-	
+	long	last_comp;
+
 	i = 0;
 	while (i < codex->nb_coders)
 	{
 		curr_time = get_current_time() - codex->start_at;
-        last_comp = codex->coders[i].last_compile_start;
+		last_comp = codex->coders[i].last_compile_start;
 		if ((curr_time - last_comp) > codex->time_to_burnout)
 		{
 			*burned_coder = codex->coders[i].id;
@@ -36,10 +35,10 @@ static int	check_burnouts(t_codex *codex, int *burned_coder)
 
 static int	check_compiles_done(t_codex *codex)
 {
-	int	i;
+	int		i;
 	long	comp_done;
 	long	comp_required;
-	
+
 	i = 0;
 	if (codex->nb_comp_required == -1)
 		return (0);
@@ -57,7 +56,7 @@ static int	check_compiles_done(t_codex *codex)
 int	codex_stopped(t_codex *codex)
 {
 	int	stopped;
-	int burned_coder;
+	int	burned_coder;
 
 	pthread_mutex_lock(&codex->events_mutex);
 	if (codex->simu_stopped)
@@ -81,15 +80,15 @@ int	codex_stopped(t_codex *codex)
 
 void	*events_checker(void *arg)
 {
-	int				i;
-	t_codex			*codex;
+	int		i;
+	t_codex	*codex;
 
-	codex = (t_codex *) arg;
+	codex = (t_codex *)arg;
 	while (1)
 	{
 		i = 0;
 		if (codex_stopped(codex))
-        {
+		{
 			while (i < codex->nb_coders)
 			{
 				pthread_mutex_lock(&codex->dongles[i]);
@@ -97,8 +96,8 @@ void	*events_checker(void *arg)
 				pthread_mutex_unlock(&codex->dongles[i]);
 				i++;
 			}
-			break;
-        }
+			break ;
+		}
 		usleep(500);
 	}
 	return (NULL);
