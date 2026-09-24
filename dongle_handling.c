@@ -42,6 +42,7 @@ static int	get_a_dongle(t_coder *coder, int dgl)
 	long	curr_time;
 	long	dead_time;
 	int		took_it;
+	struct	timespec	ts;
 
 	codex = coder->codex;
 	took_it = 0;
@@ -58,7 +59,8 @@ static int	get_a_dongle(t_coder *coder, int dgl)
 		pthread_mutex_unlock(&codex->events_mutex);
 		if (took_it)
 			break ;
-		pthread_cond_wait(&codex->condi[dgl], &codex->dongles[dgl]);
+		get_timeout(&ts, 5);
+		pthread_cond_timedwait(&codex->condi[dgl], &codex->dongles[dgl], &ts);
 		pthread_mutex_unlock(&codex->dongles[dgl]);
 	}
 	remove_req(codex, codex->dongle_heaps[dgl], coder->id);
@@ -102,11 +104,15 @@ void	drop_dongles(t_codex *codex, int first_dgl, int scnd_dgl)
 	long	curr_time;
 
 	curr_time = get_current_time() - codex->start_at;
+	pthread_mutex_lock(&codex->events_mutex);
 	codex->dgl_cldwns[first_dgl] = curr_time + codex->cldwn_dgl;
+	pthread_mutex_unlock(&codex->events_mutex);
 	pthread_mutex_unlock(&codex->dongles[first_dgl]);
 	pthread_cond_broadcast(&codex->condi[first_dgl]);
 	curr_time = get_current_time() - codex->start_at;
+	pthread_mutex_lock(&codex->events_mutex);
 	codex->dgl_cldwns[scnd_dgl] = curr_time + codex->cldwn_dgl;
+	pthread_mutex_unlock(&codex->events_mutex);
 	pthread_mutex_unlock(&codex->dongles[scnd_dgl]);
 	pthread_cond_broadcast(&codex->condi[scnd_dgl]);
 }

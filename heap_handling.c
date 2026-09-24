@@ -82,7 +82,6 @@ void	remove_req(t_codex *codex, t_heap *heap, int coder_id)
 		i = move_up(codex, heap, i);
 		move_down(codex, heap, i);
 	}
-	pthread_mutex_unlock(&codex->events_mutex);
 }
 
 void	update_req(t_codex *codex, t_heap *heap, t_req new_req)

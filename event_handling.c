@@ -60,7 +60,7 @@ void	*coder_events(void *arg)
 	}
 	while (!codex_stopped(codex))
 	{
-		if (get_both_dongles(coder, &first, &second))
+		if (!get_both_dongles(coder, &first, &second))
 			break ;
 		compiling_phase(coder, first, second);
 		debugging_and_refacto_phase(coder, "debug");

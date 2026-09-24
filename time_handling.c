@@ -21,6 +21,20 @@ long	get_current_time(void)
 	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 }
 
+void	get_timeout(struct timespec *ts, long ms_from_now)
+{
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	ts->tv_sec = tv.tv_sec + (ms_from_now / 1000);
+	ts->tv_nsec = (tv.tv_usec * 1000) + ((ms_from_now % 1000) * 1000000);
+	if (ts->tv_nsec >= 1000000000)
+	{
+		ts->tv_nsec -= 1000000000;
+		ts->tv_sec += 1;
+	}
+}
+
 void	print_events(t_codex *codex, int coder_id, char *status)
 {
 	long	curr_time;

@@ -34,6 +34,7 @@ int						get_coder_id(t_heap *heap);
 int						check_coder_id(t_coder *coder, int dgl);
 int						init_codex(t_codex *codex);
 long					get_current_time(void);
+void					get_timeout(struct timespec *ts, long ms_from_now);
 void					*coder_events(void *arg);
 void					*events_checker(void *arg);
 int						codex_stopped(t_codex *codex);
@@ -57,7 +58,6 @@ typedef struct s_req
 typedef struct s_heap
 {
 	t_req				*req;
-	int					*coder_ids;
 	int					capacity;
 	int					size;
 }						t_heap;

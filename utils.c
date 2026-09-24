@@ -28,13 +28,9 @@ int	check_priority(t_codex *codex, t_req *first, t_req *scnd)
 int	check_coder_id(t_coder *coder, int dgl)
 {
 	t_codex	*codex;
-	int		coder_id;
 
 	codex = coder->codex;
-	coder_id = get_coder_id(codex->dongle_heaps[dgl]);
-	if (coder_id == coder->id)
-		return (coder_id);
-	return (-1);
+	return (get_coder_id(codex->dongle_heaps[dgl])  == coder->id);
 }
 
 int	dongle_available(t_coder *coder, int dongle)
@@ -44,8 +40,9 @@ int	dongle_available(t_coder *coder, int dongle)
 	long	cooldown;
 
 	codex = coder->codex;
+	pthread_mutex_lock(&codex->events_mutex);
 	cooldown = codex->dgl_cldwns[dongle];
-	// pthread_mutex_unlock(&codex->dongles[dongle]);
+	pthread_mutex_unlock(&codex->events_mutex);
 	curr_time = get_current_time() - codex->start_at;
 	if (curr_time < cooldown)
 		return (0);
