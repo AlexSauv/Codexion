@@ -50,7 +50,7 @@ static long	create_threads(t_codex *codex)
 	return (i);
 }
 
-static void	joining_threads(t_codex *codex, pthread_t monitor_thread)
+static void	joining_threads(t_codex *codex)
 {
 	long	i;
 
@@ -60,7 +60,6 @@ static void	joining_threads(t_codex *codex, pthread_t monitor_thread)
 		pthread_join(codex->coders[i].thread, NULL);
 		i++;
 	}
-	pthread_join(monitor_thread, NULL);
 }
 
 static int	launch_codex(t_codex *codex)
@@ -73,8 +72,8 @@ static int	launch_codex(t_codex *codex)
 	monitor_valid = 0;
 	if (coders == codex->nb_coders)
 	{
-		monitor_valid = (pthread_create(monitor, NULL, events_checker,
-					&codex) == 0);
+		monitor_valid = (pthread_create(&monitor, NULL, events_checker,
+					codex) == 0);
 	}
 	if (coders < codex->nb_coders || !monitor_valid)
 	{
@@ -82,7 +81,7 @@ static int	launch_codex(t_codex *codex)
 		codex->simu_stopped = 1;
 		pthread_mutex_unlock(&codex->events_mutex);
 	}
-	joining_threads(&codex, monitor);
+	joining_threads(codex);
 	if (monitor_valid)
 		pthread_join(monitor, NULL);
 	return (coders == codex->nb_coders && monitor_valid);
@@ -91,7 +90,6 @@ static int	launch_codex(t_codex *codex)
 int	main(int argc, char **argv)
 {
 	t_codex		codex;
-	pthread_t	monitor_thread;
 
 	if (!args_validator(argc, argv, &codex))
 		return (1);
