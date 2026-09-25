@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 16:00:11 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/24 20:13:19 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/25 11:33:47 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static int	generate_codex(t_codex *codex)
 	codex->total_request = 0;
 	while (i < codex->nb_coders)
 	{
-		if(!init_coders(codex, i))
+		if (!init_coders(codex, i))
 		{
 			free_codex(codex);
 			return (0);
@@ -58,7 +58,6 @@ static int	generate_codex(t_codex *codex)
 	}
 	return (1);
 }
-
 
 static int	gen_alloc(t_codex *codex)
 {
@@ -80,7 +79,6 @@ static int	gen_alloc(t_codex *codex)
 	memset(codex->dgl_heaps, 0, sizeof(t_heap *) * codex->nb_coders);
 	return (1);
 }
-
 
 int	init_codex(t_codex *codex)
 {

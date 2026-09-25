@@ -6,7 +6,7 @@
 /*   By: alsauvan <alsauvan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/17 18:55:13 by alsauvan          #+#    #+#             */
-/*   Updated: 2026/09/24 17:03:54 by alsauvan         ###   ########.fr       */
+/*   Updated: 2026/09/25 11:32:45 by alsauvan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ static void	sort_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl)
 	}
 }
 
-static int try_a_dongle(t_coder *coder, t_codex *codex, int dgl, long req_time)
+static int	try_a_dongle(t_coder *coder, t_codex *codex, int dgl, long req_time)
 {
 	long			now;
 	long			dead;
@@ -35,14 +35,14 @@ static int try_a_dongle(t_coder *coder, t_codex *codex, int dgl, long req_time)
 	now = get_current_time() - codex->start_at;
 	dead = coder->last_compile_start + codex->time_to_burnout;
 	pthread_mutex_lock(&codex->events_mutex);
-	update_req(codex, codex->dgl_heaps[dgl], (t_req){coder->id, req_time, dead});
+	update_req(codex, codex->dgl_heaps[dgl],
+		(t_req){coder->id, req_time, dead});
 	took_it = 0;
 	if (now >= codex->dgl_cldwns[dgl] && check_coder_id(coder, dgl))
 		took_it = 1;
 	pthread_mutex_unlock(&codex->events_mutex);
 	return (took_it);
 }
-
 
 static int	get_a_dongle(t_coder *coder, int dgl)
 {
@@ -70,7 +70,6 @@ static int	get_a_dongle(t_coder *coder, int dgl)
 	return (took_it);
 }
 
-
 int	get_both_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl)
 {
 	t_codex	*codex;
@@ -93,7 +92,7 @@ int	get_both_dongles(t_coder *coder, int *first_dgl, int *scnd_dgl)
 				return (1);
 			pthread_mutex_unlock(&codex->dongles[*first_dgl]);
 			pthread_cond_broadcast(&codex->condi[*first_dgl]);
-			continue;
+			continue ;
 		}
 		usleep(500);
 	}
