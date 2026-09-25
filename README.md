@@ -69,6 +69,10 @@ so lines are never interleaved or corrupted.
 - POSIX threads documentation (`man pthread_create`, `man pthread_mutex_init`,
   `man pthread_cond_init`, `man pthread_cond_timedwait`)
 
+- Peer to peer (`For concepts explaination`, `Test phase for edge cases`)
+
+- AI usage (`Test phase for edge cases`, `Helping for README redaction and english   rephrases`, `Explaining notions and concepts`)
+
 ## Blocking cases handled
 
 - **Deadlock avoidance**: a coder never holds one dongle while blocking forever
